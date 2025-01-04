@@ -1,0 +1,68 @@
+--Desafio 1:
+
+CREATE OR REPLACE PROCEDURE verifica_depto (p_nome IN VARCHAR2) IS
+   v_cont NUMBER;
+BEGIN
+SELECT count(*)
+INTO v_cont
+FROM funcionario f inner join departamento d
+on f.id_departamento = d.id_departamento
+WHERE d.nome_departamento = p_nome;
+
+IF v_cont =0
+THEN DBMS_OUTPUT.PUT_LINE('O departamento não possui funcionários');
+ELSIF v_cont <=20
+THEN DBMS_OUTPUT.PUT_LINE('Departamento Pequeno');
+ELSIF v_cont <=30
+THEN DBMS_OUTPUT.PUT_LINE('Departamento Médio');
+ELSE DBMS_OUTPUT.PUT_LINE('Departamento Grande');
+END IF;
+END;
+
+--Desafio 2
+
+CREATE OR REPLACE PROCEDURE retorna_cargo
+(p_id_funcionario IN funcionario.id_funcionario%type,
+p_cargo out cargo.nome_cargo%type)
+IS
+BEGIN
+SELECT nome_cargo
+INTO p_cargo
+FROM funcionario f inner join cargo c
+on f.id_cargo = c.id_cargo
+WHERE f.id_funcionario = p_id_funcionario;
+END;
+
+--Desafio 3
+
+CREATE OR REPLACE FUNCTION retorna_departamento 
+(p_nome IN VARCHAR2) RETURN VARCHAR2
+IS  
+    v_deptno VARCHAR2(30)
+BEGIN
+    SELECT nome_departamento
+    INTO v_deptno
+    FROM funcionario f inner join departamento d
+    on f.id_departamento = d.id_departamento
+    WHERE f.nome_funcionario = p_nome;
+
+    RETURN v_deptno;
+END;
+
+--Desafio 4
+
+CREATE OR REPLACE PROCEDURE retorna_func_depto 
+(p_id_departamento IN funcionario.id_departamento%type)
+IS
+    CURSOR c_func_cargo IS
+    SELECT nome_funcionario, nome_cargo, salario
+    FROM funcionario f inner join cargo c
+    on f.id_cargo = c.id_cargo
+    WHERE f.id_departamento = p_id_departamento;
+
+BEGIN
+
+    FOR res IN c_func_cargo LOOP
+        DBMS_OUTPUT.PUT_LINE(res.nome_funcionario || '' || res.nome_cargo || '' || res.salario);
+    END LOOP;
+END;
